@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测测孩子的高考成绩</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .scratch-area {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .scores-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            box-sizing: border-box;
+            background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0.95));
+        }
+
+        .location-info {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .location-label {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .user-province {
+            display: inline-block;
+            font-size: 1.4rem;
+            color: #2c3e50;
+            font-weight: bold;
+            padding: 0.8rem 2.5rem;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15);
+            animation: slideIn 0.5s ease;
+            border: 2px solid rgba(52, 152, 219, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-province::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to right, rgba(52, 152, 219, 0.05), rgba(52, 152, 219, 0.1));
+            border-radius: 28px;
+            z-index: -1;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-15px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .total-score {
+            text-align: center;
+        }
+
+        .total-label {
+            font-size: 2.6rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .total-score .score-value {
+            font-size: 3.8rem;
+            color: #e74c3c;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-weight: bold;
+        }
+
+        .encouragement {
+            font-size: 1rem;
+            color: #3498db;
+            font-weight: 500;
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #e0e0e0;
+        }
+
+        .scratch-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            font-size: 1.5rem;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .scratch-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: none;
+            touch-action: none;
+        }
+
+        .scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            cursor: pointer;
+        }
+
+        button {
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            margin: 2rem auto;
+            opacity: 1;
+        }
+
+        .input-group, .select-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label, .select-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: #333;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .input-group input, .score-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .score-select {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+        }
+
+        .score-select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .result-comparison {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #ddd;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .prediction-result {
+            text-align: center;
+            font-size: 1.3rem;
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.8);
+        }
+
+        .prediction-result.accurate {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .prediction-result.close {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .prediction-result.far {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .score-label {
+            position: absolute;
+            left: 0;
+            background: #3498db;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 0 4px 4px 0;
+            font-size: 1rem;
+            transform: translateX(-100%);
+            opacity: 0.9;
+        }
+
+        @media screen and (max-width: 600px) {
+            .scratch-area {
+                height: 300px;
+            }
+
+            .user-province {
+                font-size: 1.1rem;
+            }
+
+            .total-score .score-value {
+                font-size: 3rem;
+            }
+        }
+
+        @keyframes scoreReveal {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .score-item {
+            animation: scoreReveal 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .score-item:nth-child(1) { animation-delay: 0.1s; }
+        .score-item:nth-child(2) { animation-delay: 0.2s; }
+        .score-item:nth-child(3) { animation-delay: 0.3s; }
+        .score-item:nth-child(4) { animation-delay: 0.4s; }
+        .score-item:nth-child(5) { animation-delay: 0.5s; }
+        .score-item:nth-child(6) { animation-delay: 0.6s; }
+
+        .location-loading {
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .loading-animation {
+            animation: pulse 1.5s infinite;
+        }
+
+        .province-info {
+            display: inline-block;
+            color: #666;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+        }
+
+        .province-loading {
+            color: #95a5a6;
+            font-size: 0.9rem;
+            font-weight: normal;
+            margin-left: 0.5rem;
+        }
+
+        @media screen and (max-width: 480px) {
+            .form-container {
+                padding: 1.5rem;
+                margin: 1rem auto;
+            }
+
+            .input-group, .select-group {
+                margin-bottom: 1.2rem;
+            }
+
+            .input-group label, .select-group label {
+                font-size: 1rem;
+            }
+
+            .score-select, .input-group input {
+                padding: 0.7rem;
+            }
+
+            button {
+                padding: 0.8rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .disclaimer {
+                font-size: 0.8rem;
+                padding: 0.8rem;
+                margin-top: 1rem;
+            }
+
+            .location-label {
+                font-size: 0.9rem;
+            }
+
+            .user-province {
+                font-size: 1.2rem;
+                padding: 0.6rem 2rem;
+            }
+
+            .scratch-area {
+                margin-bottom: 1.5rem;
+            }
+
+            .action-area {
+                margin-top: 0.8rem;
+            }
+        }
+
+        .encouragement {
+            font-size: 1rem;
+            color: #3498db;
+            font-weight: 500;
+            text-align: center;
+            margin-top: 1.5rem;
+            padding: 0.5rem 0;
+            border-top: 1px dashed #e0e0e0;
+        }
+
+        #scratchCard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .user-info {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-name {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .reset-button {
+            display: none;
+            opacity: 0;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #ff4757, #ff6b81);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+            transition: all 0.3s ease;
+            animation: attentionPulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .reset-button:hover {
+            background: linear-gradient(45deg, #ff3748, #ff5a72);
+            box-shadow: 0 6px 20px rgba(255, 71, 87, 0.6);
+            animation-play-state: paused;
+        }
+
+        /* 更加醒目的缩放动画 */
+        @keyframes attentionPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+            }
+            25% {
+                transform: scale(1.15);
+                box-shadow: 0 8px 20px rgba(255, 71, 87, 0.5);
+            }
+            50% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+            }
+            75% {
+                transform: scale(1.08);
+                box-shadow: 0 6px 18px rgba(255, 71, 87, 0.45);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+            }
+        }
+
+        /* 按钮出现时的动画 */
+        @keyframes buttonAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        #resultContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #resultContainer.fade-in {
+            opacity: 1;
+        }
+
+        .disclaimer {
+            font-size: 0.9rem;
+            color: #95a5a6;
+            text-align: center;
+            padding: 1rem;
+            line-height: 1.5;
+            background: rgba(236, 240, 241, 0.5);
+            border-radius: 8px;
+            border: 1px dashed #bdc3c7;
+        }
+
+        #userForm {
+            opacity: 1 !important;
+        }
+
+        #resultContainer {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #resultContainer.fade-in {
+            opacity: 1;
+        }
+
+        #resultContainer.hidden {
+            display: none;
+        }
+
+        .action-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        /* 添加loading相关样式 */
+        #loadingContainer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #ff6b81;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loading-text {
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: bold;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 确保resultContainer的显示效果 */
+        #resultContainer {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #resultContainer.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>你的孩子高考能考多少分？</h1>
+        
+        <!-- 表单部分 -->
+        <div id="userForm">
+            <div class="form-container">
+                <div class="input-group">
+                    <label for="userName">
+                        孩子名字
+                        <span id="provinceInfo" class="province-loading">（定位中...）</span>
+                    </label>
+                    <input type="text" id="userName" placeholder="请输入姓名" required>
+                    <div class="error-message" id="nameError">请输入孩子名字</div>
+                </div>
+                
+                <div class="select-group">
+                    <label for="predictTotal">模拟考分数</label>
+                    <select id="predictTotal" class="score-select">
+                        <option value="" disabled selected>请选择模拟考分数</option>
+                        <option value="300">300分以下</option>
+                        <option value="400">301分-400分</option>
+                        <option value="500">401分-500分</option>
+                        <option value="600">501分-600分</option>
+                        <option value="750">601分以上</option>
+                    </select>
+                    <div class="error-message" id="totalError">请选择模拟考分数</div>
+                </div>
+                
+                <button onclick="submitForm()">开始分析</button>
+            </div>
+        </div>
+
+        <!-- 结果显示部分 -->
+        <div id="resultContainer" class="hidden">
+            <div class="location-info">
+                <div class="location-label"></div>
+                <div class="user-province" id="displayProvince">--</div>
+            </div>
+
+            <div class="scratch-area">
+                <div class="scores-container">
+                    <div class="score-item total-score">
+                        <div class="total-label">总分</div>
+                        <div class="score-value" id="total">--</div>
+                    </div>
+                    <div class="encouragement" id="encouragement"></div>
+                </div>
+                <div class="scratch-overlay">
+                    <canvas class="scratch-canvas"></canvas>
+                    <div class="scratch-hint">刮开查看高考成绩</div>
+                </div>
+            </div>
+            
+            <div class="action-area">
+                <button onclick="resetForm()" class="reset-button">重新测试</button>
+                <div class="disclaimer">
+                    温馨提示：本测试仅供娱乐，，请以实际高考成绩为准！
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加loading容器 -->
+        <div id="loadingContainer" style="display: none;">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">AI正在思考中...</div>
+        </div>
+    </div>
+
+    <script>
+        let actualScores = {};
+        
+        function validateForm() {
+            const userName = document.getElementById('userName').value.trim();
+            const predictTotal = document.getElementById('predictTotal').value;
+            
+            let isValid = true;
+            
+            // 验证姓名
+            if (!userName) {
+                document.getElementById('nameError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('nameError').style.display = 'none';
+            }
+            
+            // 验证分数选择
+            if (!predictTotal) {
+                document.getElementById('totalError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('totalError').style.display = 'none';
+            }
+            
+            return isValid;
+        }
+
+        function generateTotalScore(predictRange) {
+            // 根据预测范围生成相应的实际分数范围
+            const actualRanges = {
+                '300': [350, 400],   // 预测300分以下，实际350-400
+                '400': [350, 500],   // 预测301-400，实际350-500
+                '500': [450, 550],   // 预测401-500，实际450-550
+                '600': [550, 650],   // 预测501-600，实际550-650
+                '750': [620, 750]    // 预测601以上，实际620-750
+            };
+            
+            const [min, max] = actualRanges[predictRange];
+            const score = Math.floor(Math.random() * (max - min + 1)) + min;
+
+            // 添加小幅随机波动，使分数更自然
+            const variation = Math.floor(Math.random() * 6) - 3; // -3到+3的随机波动
+            return Math.min(Math.max(score + variation, min), max); // 确保在范围内
+        }
+
+        function getScoreComment(predictRange, actualScore) {
+            // 根据预测和实际分数返回鼓励性评语
+            const comments = {
+                '300': [
+                    "你的潜力超乎想象！",
+                    "每一分进步都值得肯定！",
+                    "坚持就是胜利，继续加油！"
+                ],
+                '400': [
+                    "看，你比想象的更优秀！",
+                    "努力没有白费，继续向前！",
+                    "这只是开始，未来可期！"
+                ],
+                '500': [
+                    "付出总有回报，前程似锦！",
+                    "保持这份努力，你做得很棒！",
+                    "梦想在前方，脚步不停歇！"
+                ],
+                '600': [
+                    "优秀的表现，继续加油！",
+                    "距离目标更近了一步！",
+                    "相信自己，你已经很棒了！"
+                ],
+                '750': [
+                    "前途光明，未来可期！",
+                    "继续保持，你最棒！",
+                    "这份努力终将绽放光芒！"
+                ]
+            };
+
+            // 随机选择一条评语
+            const commentList = comments[predictRange];
+            return commentList[Math.floor(Math.random() * commentList.length)];
+        }
+
+        // 简化的位置获取功能
+        async function getProvince() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                
+                if (data.region) {
+                    updateProvinceInfo(data.region);
+                } else {
+                    throw new Error('无法获取位置信息');
+                }
+            } catch (error) {
+                console.error('获取位置失败:', error);
+                updateProvinceInfo('湖北');
+            }
+        }
+
+        function updateProvinceInfo(province) {
+            const provinceInfo = document.getElementById('provinceInfo');
+            provinceInfo.textContent = `（${province}）`;
+            provinceInfo.className = 'province-info';
+        }
+
+        // 页面加载时获取省份
+        document.addEventListener('DOMContentLoaded', getProvince);
+
+        function submitForm() {
+            if (!validateForm()) return;
+
+            
+            
+            // 显示loading效果
+            const loadingContainer = document.getElementById('loadingContainer');
+            loadingContainer.style.display = 'block';
+            
+            // 2秒后显示结果
+            setTimeout(() => {
+                // 隐藏loading
+                loadingContainer.style.display = 'none';
+                
+                // 显示结果容器
+                const resultContainer = document.getElementById('resultContainer');
+                resultContainer.style.display = 'block';
+                
+                const province = document.getElementById('provinceInfo').textContent.replace(/[()（）]/g, '');
+                const predictRange = document.getElementById('predictTotal').value;
+        
+                // 生成实际分数
+                const totalScore = generateTotalScore(predictRange);
+                
+                // 获取鼓励评语
+                const comment = getScoreComment(predictRange, totalScore);
+
+                // 更新显示
+                document.getElementById('displayProvince').textContent = province;
+                document.getElementById('total').textContent = totalScore;
+                document.getElementById('encouragement').textContent = comment;
+
+                // 更新提示文本
+                // document.querySelector('.disclaimer').innerHTML = 
+                //     `温馨提示：本测试仅供娱乐，得分随机生成，请以实际高考成绩为准。<br>
+                //     <span style="color: #3498db; font-weight: 500; margin-top: 8px; display: block;">
+                //         ${comment}
+                //     </span>`;
+
+                // 使用setTimeout确保display更新后再添加show类
+                setTimeout(() => {
+                    resultContainer.classList.add('show');
+                }, 10);
+                
+                // 隐藏表单
+                document.getElementById('userForm').style.display = 'none';
+
+                // 初始化刮刮卡
+                initScratchCard();
+                
+            }, 2000);
+        }
+
+        // 备用方案（如果主要API失败）
+        async function fallbackProvince() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                const ip = data.ip;
+                
+                const geoResponse = await fetch(`https://ipapi.co/${ip}/json/`);
+                const geoData = await geoResponse.json();
+                
+                if (geoData.region) {
+                    updateProvinceInfo(geoData.region);
+                } else {
+                    throw new Error('无法获取位置信息');
+                }
+            } catch (error) {
+                console.error('备用位置获取失败:', error);
+                updateProvinceInfo('未知地区');
+            }
+        }
+
+        // 如果主要位置服务失败，尝试备用服务
+        window.addEventListener('error', (error) => {
+            if (error.target.tagName === 'SCRIPT') {
+                fallbackProvince();
+            }
+        });
+
+        function resetForm() {
+            // 重置表单内容
+            document.getElementById('userName').value = '';
+            document.getElementById('predictTotal').selectedIndex = 0;
+
+            // 重置错误提示
+            document.querySelectorAll('.error-message').forEach(elem => {
+                elem.style.display = 'none';
+            });
+
+            // 直接使用 display 属性切换显示
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('userForm').style.display = 'block';
+        }
+
+        function initScratchCard() {
+            const overlay = document.querySelector('.scratch-overlay');
+            const canvas = document.querySelector('.scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            let isScratching = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            // 设置画布尺寸
+            function setCanvasSize() {
+                const rect = overlay.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                // 初始化画布背景
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#CCCCCC');
+                gradient.addColorStop(1, '#BBBBBB');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // 添加纹理效果
+                for (let i = 0; i < canvas.width * canvas.height / 100; i++) {
+                    ctx.fillStyle = `rgba(180, 180, 180, ${Math.random() * 0.4})`;
+                    ctx.fillRect(
+                        Math.random() * canvas.width,
+                        Math.random() * canvas.height,
+                        1,
+                        1
+                    );
+                }
+            }
+
+            function calculateScratchedPercentage() {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = imageData.data;
+                let transparentPixels = 0;
+                
+                for (let i = 3; i < pixels.length; i += 4) {
+                    if (pixels[i] === 0) {
+                        transparentPixels++;
+                    }
+                }
+                
+                const totalPixels = (canvas.width * canvas.height);
+                return (transparentPixels / totalPixels) * 100;
+            }
+
+            function scratch(x, y) {
+                ctx.globalCompositeOperation = 'destination-out';
+                
+                // 主要擦除区域
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 连接线条
+                if (lastX && lastY) {
+                    ctx.lineWidth = 40;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(lastX, lastY);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+                }
+
+                lastX = x;
+                lastY = y;
+
+                // 检查刮开百分比
+                const scratchedPercentage = calculateScratchedPercentage();
+                const scratchHint = document.querySelector('.scratch-hint');
+                const resetButton = document.querySelector('.reset-button');
+
+                // 当刮开面积达到5%时，隐藏提示文字
+                if (scratchedPercentage >= 5 && scratchHint) {
+                    scratchHint.style.opacity = '0';
+                    // 0.3秒后移除提示文字，避免占用点击区域
+                    setTimeout(() => {
+                        scratchHint.style.display = 'none';
+                    }, 300);
+                }
+
+                // 当刮开面积达到10%时，显示重新测试按钮
+                if (scratchedPercentage >= 10 && resetButton) {
+                    return;//todo
+                    resetButton.style.display = 'block';
+                    resetButton.style.animation = 'buttonAppear 0.5s ease forwards, shake 1.5s ease-in-out infinite';
+                }
+            }
+
+            // 初始化画布
+            setCanvasSize();
+            window.addEventListener('resize', setCanvasSize);
+
+            // 鼠标事件
+            canvas.addEventListener('mousedown', (e) => {
+                isScratching = true;
+                const rect = canvas.getBoundingClientRect();
+                scratch(e.clientX - rect.left, e.clientY - rect.top);
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isScratching) return;
+                const rect = canvas.getBoundingClientRect();
+                scratch(e.clientX - rect.left, e.clientY - rect.top);
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                isScratching = false;
+                lastX = lastY = 0;
+            });
+
+            canvas.addEventListener('mouseleave', () => {
+                isScratching = false;
+                lastX = lastY = 0;
+            });
+
+            // 触摸事件
+            canvas.addEventListener('touchstart', (e) => {
+                isScratching = true;
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                scratch(touch.clientX - rect.left, touch.clientY - rect.top);
+                e.preventDefault();
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (!isScratching) return;
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                scratch(touch.clientX - rect.left, touch.clientY - rect.top);
+                e.preventDefault();
+            });
+
+            canvas.addEventListener('touchend', () => {
+                isScratching = false;
+                lastX = lastY = 0;
+            });
+        }
+
+        // 确保在DOM加载完成后绑定事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('userForm');
+            if (form) {
+                form.addEventListener('submit', submitForm);
+            }
+        });
+    </script>
+</body>
+</html> 
