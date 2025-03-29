@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>测测孩子的高考成绩</title>
+    <title>测孩子的高考成绩</title>
     <style>
         body {
             font-family: 'Microsoft YaHei', sans-serif;
@@ -412,6 +412,7 @@
                 font-size: 0.8rem;
                 padding: 0.8rem;
                 margin-top: 1rem;
+                display:none;
             }
 
             .location-label {
@@ -644,7 +645,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>你的孩子高考能考多少分？</h1>
+        <h1>预测你孩子的高考成绩</h1>
         
         <!-- 表单部分 -->
         <div id="userForm">
@@ -792,6 +793,7 @@
             return commentList[Math.floor(Math.random() * commentList.length)];
         }
 
+
         // 简化的位置获取功能
         async function getProvince() {
             try {
@@ -846,7 +848,7 @@
                 const comment = getScoreComment(predictRange, totalScore);
 
                 // 更新显示
-                document.getElementById('displayProvince').textContent = province;
+                document.getElementById('displayProvince').textContent = '湖北';
                 document.getElementById('total').textContent = totalScore;
                 document.getElementById('encouragement').textContent = comment;
 
@@ -930,8 +932,8 @@
                 
                 // 初始化画布背景
                 const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-                gradient.addColorStop(0, '#CCCCCC');
-                gradient.addColorStop(1, '#BBBBBB');
+                gradient.addColorStop(0, 'yellow');
+                gradient.addColorStop(1, 'red');
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
